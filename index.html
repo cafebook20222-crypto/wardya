@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تطبيق وردية - النسخة المتقدمة | Wardya Pro</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: { extend: {
+    colors: {
+      forest: { DEFAULT:'#0a2e23', dark:'#061c15', light:'#0d3b2e', surface:'#124839' },
+      gold: { DEFAULT:'#d4af37', light:'#e6ca65', dark:'#aa8c2c' }
+    },
+    fontFamily: { cairo: ['Cairo', 'sans-serif'] }
+  }}
+}
+</script>
+<style>
+body { font-family:'Cairo', sans-serif; background: radial-gradient(circle at center, #0d3b2e 0%, #061c15 100%); min-height:100vh; }
+.hide-scrollbar::-webkit-scrollbar { display:none; }
+.hide-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+/* الحل الجذري لمشكلة hidden vs flex */
+.force-hidden { display: none !important; }
+@keyframes pulse-ring { 0% { transform:scale(0.95); box-shadow:0 0 0 0 rgba(212,175,55,0.7);} 70% { transform:scale(1); box-shadow:0 0 0 15px rgba(212,175,55,0);} 100% { transform:scale(0.95); box-shadow:0 0 0 0 rgba(212,175,55,0);} }
+.pulse-ring { animation: pulse-ring 2s infinite; }
+@keyframes slide-up { from { transform:translateY(20px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+.slide-up { animation: slide-up 0.3s ease-out; }
+@keyframes slide-in { from { transform:translateX(100%); } to { transform:translateX(0); } }
+.slide-in { animation: slide-in 0.3s ease-out; }
+</style>
+</head>
+<body class="flex flex-col items-center justify-center p-2 sm:p-6 text-slate-100 min-h-screen">
+
+<div class="mb-4 text-center space-y-1">
+  <h1 class="text-xl sm:text-2xl font-black text-gold tracking-wide flex items-center justify-center gap-2">
+    <i class="fa-solid fa-kaaba text-gold"></i> منصة وَردِيّة | Wardya
+  </h1>
+  <p class="text-xs text-emerald-200">النسخة المتقدمة — التوظيف الموسمي بالساعة</p>
+</div>
+
+<!-- PHONE FRAME -->
+<div class="relative w-full max-w-[420px] h-[850px] bg-black rounded-[50px] p-3 shadow-2xl border-[6px] border-slate-700/80 ring-1 ring-gold/30 flex flex-col justify-between overflow-hidden">
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-[80] flex items-center justify-between px-4">
+    <div class="w-3 h-3 bg-emerald-900 rounded-full flex items-center justify-center">
+      <div class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></div>
+    </div>
+    <div class="w-10 h-1 bg-slate-800 rounded-full"></div>
+  </div>
+
+  <div class="relative w-full h-full bg-forest-dark rounded-[40px] overflow-hidden border border-forest-light">
+
+    <!-- MAIN APP -->
+    <div id="mainApp" class="force-hidden flex flex-col h-full pt-6">
+      <div class="bg-forest-light/95 backdrop-blur-md px-3 py-2.5 border-b border-gold/20 flex items-center justify-between z-40">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-gold-light to-gold flex items-center justify-center text-forest-dark font-black text-lg shadow-md border border-gold-light">و</div>
+          <div>
+            <h2 class="font-extrabold text-[11px] text-white leading-tight">وَردِيّة <span class="text-gold font-normal">| Wardya</span></h2>
+            <p class="text-[8px] text-emerald-300/80 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span> مكة المكرمة
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button onclick="openNotifications()" class="relative w-8 h-8 rounded-full bg-forest-surface flex items-center justify-center border border-gold/30">
+            <i class="fa-solid fa-bell text-gold text-xs"></i>
+            <span id="notifBadge" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center border border-forest-dark">0</span>
+          </button>
+          <button onclick="openChat()" class="relative w-8 h-8 rounded-full bg-forest-surface flex items-center justify-center border border-gold/30">
+            <i class="fa-solid fa-comment-dots text-gold text-xs"></i>
+            <span id="chatBadge" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 text-white text-[8px] font-bold flex items-center justify-center border border-forest-dark">0</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-forest-dark px-3 py-1 border-b border-white/5 flex items-center justify-between text-[10px]">
+        <div class="flex items-center gap-1 text-emerald-300">
+          <i class="fa-solid fa-mosque text-gold text-[10px]"></i>
+          <span class="font-bold" id="nextPrayerText">—</span>
+        </div>
+        <div class="flex items-center gap-1 text-[9px]" id="connectionBox">
+          <i class="fa-solid fa-wifi text-emerald-400"></i>
+          <span id="connectionStatus" class="text-emerald-400">متصل</span>
+        </div>
+      </div>
+
+      <div class="bg-forest p-1.5 border-b border-forest-light flex text-[10px] font-bold gap-1">
+        <button id="btnRoleSeeker" onclick="setRole('seeker')" class="flex-1 py-1.5 rounded-lg transition-all flex items-center justify-center gap-1">
+          <i class="fa-solid fa-user-graduate"></i> باحث عن وردية
+        </button>
+        <button id="btnRoleProvider" onclick="setRole('provider')" class="flex-1 py-1.5 rounded-lg transition-all flex items-center justify-center gap-1">
+          <i class="fa-solid fa-building-user"></i> منشأة
+        </button>
+      </div>
+
+      <div id="screenContainer" class="flex-1 overflow-y-auto hide-scrollbar p-3 space-y-3 text-slate-100"></div>
+
+      <div class="bg-forest-dark/95 backdrop-blur-md border-t border-gold/20 py-2 px-1 flex justify-around items-center text-[9px] text-emerald-200/70 z-40">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center gap-0.5 transition-all px-1">
+          <i class="fa-solid fa-chart-pie text-base"></i><span>الرئيسية</span>
+        </button>
+        <button onclick="switchTab('map')" id="nav-map" class="flex flex-col items-center gap-0.5 transition-all px-1">
+          <i class="fa-solid fa-map-location-dot text-base"></i><span>الخريطة</span>
+        </button>
+        <button onclick="switchTab('create')" id="nav-create" class="flex flex-col items-center gap-0.5 transition-all px-1 relative">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-gold to-gold-light text-forest-dark flex items-center justify-center -mt-4 shadow-lg border border-white/20">
+            <i class="fa-solid fa-plus text-sm font-black"></i>
+          </div>
+          <span class="text-[8px]">طلب</span>
+        </button>
+        <button onclick="switchTab('shifts')" id="nav-shifts" class="flex flex-col items-center gap-0.5 transition-all px-1">
+          <i class="fa-solid fa-file-signature text-base"></i><span>وردياتي</span>
+        </button>
+        <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center gap-0.5 transition-all px-1">
+          <i class="fa-solid fa-id-card-clip text-base"></i><span>الملف</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- AUTH SCREEN -->
+    <div id="authScreen" class="force-hidden absolute inset-0 z-[65] bg-forest-dark flex flex-col">
+      <div class="flex-1 flex flex-col items-center justify-center p-6 space-y-6 pt-12 overflow-y-auto hide-scrollbar">
+        <div class="text-center space-y-2">
+          <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-gold-light to-gold flex items-center justify-center text-forest-dark font-black text-4xl shadow-2xl border-4 border-gold-light/30">و</div>
+          <h1 class="text-2xl font-black text-gold">وَردِيّة</h1>
+          <p class="text-xs text-emerald-200">منصة التوظيف الموسمي بالساعة</p>
+        </div>
+        <div id="authStep1" class="w-full space-y-3">
+          <label class="block text-xs font-bold text-emerald-200">رقم الجوال</label>
+          <div class="flex items-center gap-2 bg-forest-surface border border-gold/30 rounded-xl p-3">
+            <span class="text-slate-300 text-sm font-bold" dir="ltr">+966</span>
+            <input id="phoneInput" type="tel" placeholder="5XXXXXXXX" maxlength="9" class="flex-1 bg-transparent outline-none text-white font-bold text-sm text-center" dir="ltr">
+          </div>
+          <button onclick="sendOTP()" class="w-full bg-gradient-to-r from-gold to-gold-light text-forest-dark font-black py-3 rounded-xl shadow-lg text-sm">
+            <i class="fa-solid fa-paper-plane ml-1"></i> إرسال رمز التحقق
+          </button>
+          <p class="text-[10px] text-center text-slate-400 leading-relaxed">بالدخول أنت توافق على <span class="text-gold">الشروط والأحكام</span></p>
+          <div class="flex items-center gap-2 justify-center pt-2 text-[10px] text-slate-400">
+            <i class="fa-solid fa-shield-halved text-gold"></i>
+            <span>محمي عبر نفاذ / أبشر</span>
+          </div>
+        </div>
+        <div id="authStep2" class="force-hidden w-full space-y-3">
+          <label class="block text-xs font-bold text-emerald-200 text-center">أدخل رمز التحقق</label>
+          <p class="text-center text-[10px] text-slate-400">تم الإرسال إلى <span class="text-gold font-bold" id="sentToPhone">—</span></p>
+          <div class="flex justify-center gap-2" id="otpInputs"></div>
+          <p class="text-center text-[10px] text-slate-400">لم تستلم الرمز؟ <button onclick="sendOTP()" class="text-gold font-bold">إعادة الإرسال</button></p>
+          <button onclick="verifyOTP()" class="w-full bg-gradient-to-r from-gold to-gold-light text-forest-dark font-black py-3 rounded-xl shadow-lg text-sm">
+            <i class="fa-solid fa-shield-halved ml-1"></i> تحقق ودخول
+          </button>
+          <button onclick="backToPhone()" class="w-full text-xs text-emerald-300 py-2">← تغيير رقم الجوال</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVE SHIFT OVERLAY -->
+    <div id="activeShiftOverlay" class="force-hidden absolute inset-0 z-[55] bg-forest-dark flex flex-col"></div>
+
+    <!-- NOTIFICATIONS DRAWER -->
+    <div id="notificationsDrawer" class="force-hidden absolute top-0 right-0 h-full w-[88%] bg-forest-dark z-[56] flex flex-col"></div>
+
+    <!-- CHAT SCREENS -->
+    <div id="chatScreen" class="force-hidden absolute inset-0 z-[57] bg-forest-dark flex flex-col"></div>
+    <div id="chatView" class="force-hidden absolute inset-0 z-[58] bg-forest-dark flex flex-col"></div>
+
+    <!-- WALLET -->
+    <div id="walletScreen" class="force-hidden absolute inset-0 z-[57] bg-forest-dark flex flex-col"></div>
+
+    <!-- SETTINGS -->
+    <div id="settingsScreen" class="force-hidden absolute inset-0 z-[57] bg-forest-dark flex flex-col"></div>
+
+    <!-- MODAL -->
+    <div id="modalContainer" class="force-hidden absolute inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"></div>
+
+  </div>
+</div>
+
+<script>
+/* ============ STATE ============ */
+const state = {
+  isAuthenticated: false,
+  userRole: 'seeker',
+  activeTab: 'dashboard',
+  shiftsSubTab: 'upcoming',
+  isOffline: false,
+  user: { name:'عبد الله محمد العتيبي', rating:4.9, totalShifts:28, totalHours:164 },
+  provider: { name:'شركة إكرام الحرمين للضيافة' },
+  wallet: {
+    balance: 7380,
+    transactions: [
+      { type:'credit', amount:360, description:'أرباح وردية - برج الساعة', date:'27 أكتوبر 2026' },
+      { type:'credit', amount:480, description:'أرباح وردية - مخيمات منى', date:'26 أكتوبر 2026' },
+      { type:'debit', amount:1000, description:'سحب بنكي', date:'25 أكتوبر 2026' }
+    ]
+  },
+  notifications: [
+    { id:1, title:'وردية جديدة قريبة منك', body:'فندق برج الساعة - 45 ر.س/ساعة', time:'قبل 5 دقائق', read:false, icon:'fa-bolt', color:'text-amber-400' },
+    { id:2, title:'تم قبول طلبك', body:'مشرف تفويج بمخيمات منى', time:'قبل ساعة', read:false, icon:'fa-check-circle', color:'text-emerald-400' },
+    { id:3, title:'تذكير بالحضور', body:'ورديتك القادمة بعد ساعتين', time:'قبل 3 ساعات', read:true, icon:'fa-clock', color:'text-blue-400' }
+  ],
+  chats: [
+    { id:1, name:'فندق برج الساعة', avatar:'ف', lastMessage:'متى تستطيع البدء؟', time:'10:30 ص', unread:2, messages:[
+      { from:'them', text:'السلام عليكم، تم قبول طلبك', time:'10:25 ص' },
+      { from:'me', text:'شكراً جزيلاً', time:'10:28 ص' },
+      { from:'them', text:'متى تستطيع البدء؟', time:'10:30 ص' }
+    ]},
+    { id:2, name:'شركة مخيمات منى', avatar:'م', lastMessage:'تم إرسال العقد', time:'09:15 ص', unread:0, messages:[
+      { from:'them', text:'تم إرسال العقد الرقمي لك', time:'09:15 ص' }
+    ]}
+  ],
+  activeShift: null,
+  shifts: {
+    upcoming: [
+      { id:'WRD-001', title:'مشرف تفويج بمخيمات منى', place:'المشاعر - منى', date:'غداً 04:00 م', rate:60, hours:8 }
+    ],
+    past: [
+      { id:'P1', title:'استقبال - برج الساعة', place:'مكة', date:'27 أكتوبر 2026', rate:45, hours:8, earned:360, rating:5 }
+    ]
+  },
+  reviews: [
+    { id:1, name:'فندق برج الساعة', rating:5, text:'موظف ملتزم ومحترف.', date:'27 أكتوبر 2026' }
+  ],
+  prayerTimes: [
+    { name:'الفجر', time:'04:32' }, { name:'الظهر', time:'12:18' },
+    { name:'العصر', time:'15:35' }, { name:'المغرب', time:'18:50' }, { name:'العشاء', time:'20:20' }
+  ]
+};
+
+let activeShiftTimer = null;
+let selectedRating = 0;
+
+/* ============ HELPERS ============ */
+function showEl(id) { document.getElementById(id).classList.remove('force-hidden'); }
+function hideEl(id) { document.getElementById(id).classList.add('force-hidden'); }
+function saveState() {
+  try { localStorage.setItem('wardya', JSON.stringify({
+    isAuthenticated: state.isAuthenticated,
+    userRole: state.userRole
+  })); } catch(e){}
+}
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem('wardya') || '{}');
+    if (s.isAuthenticated) state.isAuthenticated = true;
+    if (s.userRole) state.userRole = s.userRole;
+  } catch(e){}
+}
+
+/* ============ AUTH ============ */
+function buildOtpInputs() {
+  const cont = document.getElementById('otpInputs');
+  cont.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    const inp = document.createElement('input');
+    inp.maxLength = 1; inp.inputMode = 'numeric'; inp.type = 'tel';
+    inp.className = 'w-10 h-12 bg-forest-surface border border-gold/30 rounded-xl text-center text-lg font-black text-gold outline-none focus:border-gold';
+    inp.addEventListener('input', (e) => moveOtp(e.target, i));
+    inp.addEventListener('keydown', (e) => handleOtpKey(e, i));
+    cont.appendChild(inp);
+  }
+}
+function moveOtp(el, idx) {
+  el.value = el.value.replace(/\D/g, '');
+  if (el.value && idx < 5) document.querySelectorAll('#otpInputs input')[idx + 1].focus();
+  const all = document.querySelectorAll('#otpInputs input');
+  if ([...all].every(i => i.value)) setTimeout(verifyOTP, 300);
+}
+function handleOtpKey(e, idx) {
+  if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+    document.querySelectorAll('#otpInputs input')[idx - 1].focus();
+  }
+}
+function sendOTP() {
+  const phone = document.getElementById('phoneInput').value.trim();
+  if (phone.length < 9) { alert('أدخل رقم جوال صحيح (9 أرقام)'); return; }
+  document.getElementById('sentToPhone').innerText = '+966 ' + phone;
+  document.getElementById('authStep1').classList.add('force-hidden');
+  document.getElementById('authStep2').classList.remove('force-hidden');
+  setTimeout(() => document.querySelectorAll('#otpInputs input')[0].focus(), 100);
+}
+function backToPhone() {
+  document.getElementById('authStep1').classList.remove('force-hidden');
+  document.getElementById('authStep2').classList.add('force-hidden');
+  document.querySelectorAll('#otpInputs input').forEach(i => i.value = '');
+}
+function verifyOTP() {
+  state.isAuthenticated = true;
+  saveState();
+  hideEl('authScreen');
+  showEl('mainApp');
+  updateRoleButtons();
+  updateNavBar();
+  renderAppScreen();
+  updateBadges();
+  updatePrayerBar();
+}
+function logout() {
+  if (!confirm('هل تريد تسجيل الخروج؟')) return;
+  state.isAuthenticated = false;
+  state.activeShift = null;
+  if (activeShiftTimer) clearInterval(activeShiftTimer);
+  saveState();
+  hideEl('settingsScreen');
+  hideEl('mainApp');
+  showEl('authScreen');
+  backToPhone();
+}
+
+/* ============ NAV ============ */
+function setRole(role) {
+  state.userRole = role;
+  saveState();
+  updateRoleButtons();
+  renderAppScreen();
+}
+function updateRoleButtons() {
+  const s = document.getElementById('btnRoleSeeker');
+  const p = document.getElementById('btnRoleProvider');
+  const active = 'flex-1 py-1.5 rounded-lg bg-gradient-to-r from-gold to-gold-light text-forest-dark font-black shadow transition-all flex items-center justify-center gap-1';
+  const inactive = 'flex-1 py-1.5 rounded-lg text-emerald-200 hover:text-white transition-all flex items-center justify-center gap-1';
+  if (state.userRole === 'seeker') { s.className = active; p.className = inactive; }
+  else { p.className = active; s.className = inactive; }
+}
+function switchTab(tab) {
+  state.activeTab = tab;
+  updateNavBar();
+  renderAppScreen();
+}
+function updateNavBar() {
+  const tabs = ['dashboard','map','create','shifts','profile'];
+  tabs.forEach(t => {
+    const el = document.getElementById('nav-' + t);
+    if (!el) return;
+    if (t === state.activeTab) {
+      el.className = "flex flex-col items-center gap-0.5 transition-all px-1 text-gold font-bold";
+    } else {
+      el.className = "flex flex-col items-center gap-0.5 transition-all px-1 text-emerald-200/70 hover:text-gold";
+    }
+  });
+}
+
+/* ============ RENDER DISPATCHER ============ */
+function renderAppScreen() {
+  if (state.activeTab === 'dashboard') renderDashboard();
+  else if (state.activeTab === 'map') renderMap();
+  else if (state.activeTab === 'create') renderCreate();
+  else if (state.activeTab === 'shifts') renderShifts();
+  else if (state.activeTab === 'profile') renderProfile();
+}
+
+/* ============ DASHBOARD ============ */
+function renderDashboard() {
+  const c = document.getElementById('screenContainer');
+  if (state.userRole === 'seeker') {
+    c.innerHTML = `
+      ${state.activeShift ? `
+      <div class="bg-gradient-to-r from-emerald-600 to-emerald-500 p-3 rounded-2xl border border-emerald-400 space-y-2">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+          <span class="text-[10px] font-black text-white">وردية نشطة الآن</span>
+        </div>
+        <h3 class="font-bold text-white text-xs">${state.activeShift.title}</h3>
+        <button onclick="showActiveShiftOverlay()" class="w-full bg-white text-emerald-700 font-black py-1.5 rounded-xl text-xs">
+          <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i> استعراض
+        </button>
+      </div>` : ''}
+
+      <div class="grid grid-cols-3 gap-2">
+        <div class="bg-forest-surface/80 p-2.5 rounded-2xl border border-gold/20 text-center">
+          <p class="text-[9px] text-emerald-300 font-semibold">الورديات</p>
+          <p class="text-sm font-black text-gold">${state.user.totalShifts}</p>
+        </div>
+        <div class="bg-forest-surface/80 p-2.5 rounded-2xl border border-gold/20 text-center">
+          <p class="text-[9px] text-emerald-300 font-semibold">الساعات</p>
+          <p class="text-sm font-black text-white">${state.user.totalHours}</p>
+        </div>
+        <div class="bg-forest-surface/80 p-2.5 rounded-2xl border border-gold/20 text-center">
+          <p class="text-[9px] text-emerald-300 font-semibold">الأرباح</p>
+          <p class="text-sm font-black text-emerald-400">${state.wallet.balance.toLocaleString('ar-SA')}</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="openWallet()" class="bg-gradient-to-br from-gold to-gold-light text-forest-dark p-2.5 rounded-xl font-black text-[10px] flex flex-col items-center gap-1 shadow">
+          <i class="fa-solid fa-wallet text-lg"></i> المحفظة
+        </button>
+        <button onclick="openChat()" class="bg-forest-surface border border-gold/30 text-gold p-2.5 rounded-xl font-black text-[10px] flex flex-col items-center gap-1">
+          <i class="fa-solid fa-comments text-lg"></i> المحادثات
+        </button>
+      </div>
+
+      <div class="bg-gradient-to-r from-forest-surface to-forest p-3 rounded-2xl border border-gold/30 flex items-center justify-between">
+        <div>
+          <h3 class="font-extrabold text-xs text-gold flex items-center gap-1"><i class="fa-solid fa-bolt text-amber-400"></i> ورديات عاجلة</h3>
+          <p class="text-[10px] text-slate-300">كوادر فورية لموسم الحج والعمرة</p>
+        </div>
+        <span class="bg-emerald-500/20 text-emerald-300 text-[9px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/40 animate-pulse">حيّ</span>
+      </div>
+
+      <div class="space-y-2.5">
+        <div class="bg-forest-surface/90 p-3 rounded-2xl border border-gold/30 space-y-2">
+          <div class="flex justify-between items-start">
+            <div class="flex gap-2 items-center">
+              <div class="w-9 h-9 rounded-xl bg-forest-dark border border-gold/40 flex items-center justify-center text-gold text-base">
+                <i class="fa-solid fa-hotel"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-xs text-white">موظف استقبال وضيافة</h4>
+                <p class="text-[10px] text-emerald-300">فندق برج الساعة - مكة</p>
+              </div>
+            </div>
+            <div class="text-left">
+              <span class="text-xs font-black text-gold bg-gold/10 px-2 py-0.5 rounded-lg border border-gold/30">45 ر.س/س</span>
+              <p class="text-[8px] text-slate-400 mt-0.5">6 ساعات</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-[10px] bg-forest-dark/60 p-2 rounded-xl text-slate-300">
+            <span><i class="fa-solid fa-location-dot text-red-400 ml-1"></i> 1.2 كم</span>
+            <span><i class="fa-solid fa-clock text-amber-400 ml-1"></i> 04:00 م</span>
+            <span class="text-emerald-400 font-bold"><i class="fa-solid fa-shield-halved ml-1"></i> مؤمن</span>
+          </div>
+          <div class="flex gap-1.5">
+            <button onclick="openChatWith(1)" class="flex-1 bg-forest border border-gold text-gold font-bold py-1.5 rounded-xl text-[10px]">
+              <i class="fa-solid fa-comment"></i> استفسار
+            </button>
+            <button onclick="applyToShift('موظف استقبال وضيافة', 45, 'فندق برج الساعة')" class="flex-1 bg-gradient-to-r from-gold to-gold-light text-forest-dark font-black py-1.5 rounded-xl text-[10px]">
+              <i class="fa-solid fa-paper-plane"></i> تقديم
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-forest-surface/90 p-3 rounded-2xl border border-gold/20 space-y-2">
+          <div class="flex justify-between items-start">
+            <div class="flex gap-2 items-center">
+              <div class="w-9 h-9 rounded-xl bg-forest-dark border border-emerald-400/40 flex items-center justify-center text-emerald-400 text-base">
+                <i class="fa-solid fa-tents"></i>
+              </div>
+              <div>
+                <h4 class="font-bold text-xs text-white">مشرف تفويج حجاج</h4>
+                <p class="text-[10px] text-emerald-300">مخيمات منى</p>
+              </div>
+            </div>
+            <div class="text-left">
+              <span class="text-xs font-black text-gold bg-gold/10 px-2 py-0.5 rounded-lg border border-gold/30">60 ر.س/س</span>
+              <p class="text-[8px] text-slate-400 mt-0.5">8 ساعات</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-[10px] bg-forest-dark/60 p-2 rounded-xl text-slate-300">
+            <span><i class="fa-solid fa-location-dot text-red-400 ml-1"></i> المشاعر</span>
+            <span><i class="fa-solid fa-passport text-purple-400 ml-1"></i> تصريح</span>
+            <span class="text-emerald-400 font-bold"><i class="fa-solid fa-utensils ml-1"></i> إعاشة</span>
+          </div>
+          <div class="flex gap-1.5">
+            <button onclick="openChatWith(2)" class="flex-1 bg-forest border border-gold text-gold font-bold py-1.5 rounded-xl text-[10px]">
+              <i class="fa-solid fa-comment"></i> استفسار
+            </button>
+            <button onclick="applyToShift('مشرف تفويج حجاج', 60, 'مخيمات منى')" class="flex-1 bg-gradient-to-r from-gold to-gold-light text-forest-dark font-black py-1.5 rounded-xl text-[10px]">
+              <i class="fa-solid fa-paper-plane"></i> تقديم
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    c.innerHTML = `
+      <div class="grid grid-cols-3 gap-2">
+        <div class="bg-forest-surface/80 p-2.5 rounded-2xl border border-gold/20 text-center">
+          <p class="text-[9px] text-emerald-300 font-semibold">طلبات</p>
+          <p class="text-sm font-black text-gold">12</p>
+        </div>
+        <div class="bg-forest-surface/80 p-2.5 rounded-2xl border border-gold/20 text-center">
+          <p class="text-[9px] text-emerald-300 font-semibold">كوادر</p>
+          <p class="text-sm font-black text-white">45</p>
+        </div>
+        <div class="bg-forest-surface/80 p-2.5 rounded-2xl border border-gold/20 text-center">
+          <p class="text-[9px] text-emerald-300 font-semibold">المصروفات</p>
+          <p class="text-sm font-black text-emerald-400">18.5k</p>
+        </div>
+      </div>
+      <div class="bg-gradient-to-r from-forest-surface to-forest p-3 rounded-2xl border border-gold/30 flex items-center justify-between">
+        <div>
+          <h3 class="font-extrabold text-xs text-gold">إدارة طلبات التوظيف</h3>
+          <p class="text-[10px] text-slate-300">${state.provider.name}</p>
+        </div>
+        <button onclick="switchTab('create')" class="bg-gold text-forest-dark font-black text-[10px] px-3 py-1 rounded-xl">+ طلب</button>
+      </div>
+      <div class="space-y-2">
+        <h4 class="text-xs font-bold text-emerald-200">الورديات المعروضة:</h4>
+        <div class="bg-forest-surface p-3 rounded-2xl border border-gold/20 space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="font-extrabold text-white text-xs">15 مشرف تفويج (منى)</span>
+            <span class="bg-emerald-500/20 text-emerald-300 text-[9px] px-2 py-0.5 rounded-full font-bold">12/15</span>
+          </div>
+          <div class="w-full bg-forest-dark h-2 rounded-full overflow-hidden">
+            <div class="bg-gold h-full" style="width:80%"></div>
+          </div>
+          <div class="flex justify-between text-[10px] text-slate-300">
+            <span>50 ر.س/س</span><span>قيد التنفيذ</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+}
+
+/* ============ MAP ============ */
+function renderMap() {
+  const c = document.getElementById('screenContainer');
+  c.innerHTML = `
+    <div class="bg-forest-surface rounded-2xl p-2 border border-gold/30 space-y-2">
+      <div class="flex justify-between items-center px-1">
+        <span class="text-xs font-bold text-gold flex items-center gap-1">
+          <i class="fa-solid fa-map-pin text-red-400"></i> خريطة المناوبات
+        </span>
+        <span class="text-[9px] bg-forest-dark text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30">GPS</span>
+      </div>
+      <div class="w-full h-64 bg-slate-900 rounded-xl relative border border-gold/20 overflow-hidden flex items-center justify-center">
+        <div class="absolute inset-0 opacity-20" style="background-image:radial-gradient(#d4af37 1px,transparent 1px);background-size:20px 20px;"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gold/20 border border-gold rounded-full flex items-center justify-center pulse-ring">
+          <i class="fa-solid fa-kaaba text-gold text-lg"></i>
+        </div>
+        <button onclick="selectMapPin('برج الساعة','45 ر.س/س','0.4 كم','استقبال ضيافة')" class="absolute top-10 right-10 bg-gold text-forest-dark font-black px-2 py-1 rounded-lg text-[9px] shadow-lg animate-bounce">📍 45 ر.س</button>
+        <button onclick="selectMapPin('مخيمات منى','60 ر.س/س','المشاعر','مشرف تفويج')" class="absolute bottom-12 left-8 bg-emerald-500 text-white font-black px-2 py-1 rounded-lg text-[9px] shadow-lg">⛺ 60 ر.س</button>
+        <button onclick="selectMapPin('دار التوحيد','50 ر.س/س','المركزية','إعاشة')" class="absolute top-1/3 left-10 bg-amber-400 text-forest-dark font-black px-2 py-1 rounded-lg text-[9px] shadow-lg">🏨 50 ر.س</button>
+      </div>
+      <div class="bg-forest-dark p-3 rounded-xl border border-gold/40 space-y-1 text-xs">
+        <div class="flex justify-between items-center">
+          <h4 id="pinTitle" class="font-extrabold text-gold">برج الساعة</h4>
+          <span id="pinRate" class="bg-gold/20 text-gold px-2 py-0.5 rounded text-[10px] font-bold">45 ر.س/س</span>
+        </div>
+        <p id="pinDesc" class="text-[10px] text-slate-300">الوظيفة: استقبال</p>
+        <div class="flex justify-between items-center text-[9px] text-emerald-400 pt-1">
+          <span id="pinDist"><i class="fa-solid fa-location-arrow"></i> 0.4 كم</span>
+          <button onclick="applyToShift('استقبال ضيافة', 45, 'برج الساعة')" class="bg-gold text-forest-dark px-2.5 py-1 rounded-lg font-black">حجز</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function selectMapPin(title, rate, dist, desc) {
+  document.getElementById('pinTitle').innerText = title;
+  document.getElementById('pinRate').innerText = rate;
+  document.getElementById('pinDist').innerHTML = `<i class="fa-solid fa-location-arrow"></i> ${dist}`;
+  document.getElementById('pinDesc').innerText = 'الوظيفة: ' + desc;
+}
+
+/* ============ CREATE ============ */
+function renderCreate() {
+  const c = document.getElementById('screenContainer');
+  c.innerHTML = `
+    <div class="bg-forest-surface p-3.5 rounded-2xl border border-gold/30 space-y-3 text-xs">
+      <div class="border-b border-gold/20 pb-2 flex justify-between items-center">
+        <h3 class="font-black text-gold text-sm"><i class="fa-solid fa-circle-plus text-amber-400"></i> نشر طلب جديد</h3>
+        <span class="text-[9px] bg-gold/10 text-gold border border-gold/30 px-2 py-0.5 rounded-full font-bold">حاسبة</span>
+      </div>
+      <form onsubmit="publishShift(event)" class="space-y-2.5">
+        <div>
+          <label class="block text-emerald-200 font-bold mb-1">المسمى:</label>
+          <select id="shiftRoleSelect" onchange="calcShiftCost()" class="w-full bg-forest-dark border border-gold/30 p-2 rounded-xl text-white font-semibold">
+            <option value="45">مشرف تفويج (45 ر.س/س)</option>
+            <option value="40">استقبال فنادق (40 ر.س/س)</option>
+            <option value="55">طاهٍ إعاشة (55 ر.س/س)</option>
+            <option value="60">مرشد لغات (60 ر.س/س)</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-emerald-200 font-bold mb-1">الكوادر:</label>
+            <input type="number" id="workersCount" value="5" min="1" oninput="calcShiftCost()" class="w-full bg-forest-dark border border-gold/30 p-2 rounded-xl text-center font-bold text-gold">
+          </div>
+          <div>
+            <label class="block text-emerald-200 font-bold mb-1">الساعات:</label>
+            <input type="number" id="hoursCount" value="8" min="1" oninput="calcShiftCost()" class="w-full bg-forest-dark border border-gold/30 p-2 rounded-xl text-center font-bold text-gold">
+          </div>
+        </div>
+        <div class="bg-forest-dark p-3 rounded-xl border border-gold/40 space-y-1 text-[11px]">
+          <div class="flex justify-between text-slate-300"><span>أجر الكوادر:</span><span id="baseCostText">1,800 ر.س</span></div>
+          <div class="flex justify-between text-slate-300"><span>عمولة (15%):</span><span id="feeCostText">270 ر.س</span></div>
+          <hr class="border-white/10 my-1">
+          <div class="flex justify-between font-extrabold text-gold text-xs"><span>الإجمالي:</span><span id="totalCostText">2,070 ر.س</span></div>
+        </div>
+        <button type="submit" class="w-full bg-gradient-to-r from-gold to-gold-light text-forest-dark font-black py-2.5 rounded-xl text-xs">
+          <i class="fa-solid fa-bolt ml-1"></i> نشر الطلب
+        </button>
+      </form>
+    </div>
+  `;
+  calcShiftCost();
+}
+function calcShiftCost() {
+  const el = document.getElementById('shiftRoleSelect');
+  if (!el) return;
+  const r = parseFloat(el.value) || 45;
+  const w = parseInt(document.getElementById('workersCount').value) || 1;
+  const h = parseInt(document.getElementById('hoursCount').value) || 1;
+  const base = r * w * h, fee = base * 0.15;
+  document.getElementById('baseCostText').innerText = base.toLocaleString('ar-SA') + ' ر.س';
+  document.getElementById('feeCostText').innerText = fee.toLocaleString('ar-SA') + ' ر.س';
+  document.getElementById('totalCostText').innerText = (base+fee).toLocaleString('ar-SA') + ' ر.س';
+}
+function publishShift(e) {
+  e.preventDefault();
+  alert('✅ تم نشر الطلب! سيتم إشعار الكوادر.');
+  switchTab('dashboard');
+}
+
+/* ============ SHIFTS ============ */
+function renderShifts() {
+  const c = document.getElementById('screenContainer');
+  if (state.userRole === 'provider') {
+    c.innerHTML = `
+      <div class="bg-forest-surface p-3 rounded-2xl border border-gold/30 space-y-2">
+        <h3 class="font-black text-gold text-sm">📋 الطلبات المنشورة</h3>
+        <div class="bg-forest-dark p-2.5 rounded-xl space-y-1.5">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-white text-xs">مشرف تفويج (منى)</span>
+            <span class="bg-emerald-500/20 text-emerald-300 text-[9px] px-2 py-0.5 rounded-full">12/15</span>
+          </div>
+          <div class="w-full bg-forest h-1.5 rounded-full overflow-hidden"><div class="bg-gold h-full" style="width:80%"></div></div>
+          <div class="text-[10px] text-slate-300">50 ر.س/س • 8 ساعات</div>
+        </div>
+        <button onclick="switchTab('create')" class="w-full bg-gold text-forest-dark font-black py-2 rounded-xl text-xs">+ طلب جديد</button>
+      </div>
+    `;
+    return;
+  }
+
+  const tabsHtml = `
+    <button onclick="state.shiftsSubTab='upcoming';renderShifts()" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold ${state.shiftsSubTab === 'upcoming' ? 'bg-gold text-forest-dark shadow' : 'text-emerald-200'}">القادمة</button>
+    <button onclick="state.shiftsSubTab='past';renderShifts()" class="flex-1 py-1.5 rounded-lg text-[10px] font-bold ${state.shiftsSubTab === 'past' ? 'bg-gold text-forest-dark shadow' : 'text-emerald-200'}">السابقة</button>
+  `;
+
+  let content = '';
+  if (state.shiftsSubTab === 'upcoming') {
+    content = state.shifts.upcoming.length === 0
+      ? `<p class="text-center text-slate-400 text-xs py-8">لا توجد ورديات قادمة</p>`
+      : state.shifts.upcoming.map(s => `
+        <div class="bg-forest-surface p-3 rounded-2xl border border-gold/20 space-y-2">
+          <div class="flex justify-between items-start">
+            <div>
+              <h4 class="font-bold text-white text-xs">${s.title}</h4>
+              <p class="text-[10px] text-emerald-300">${s.place}</p>
+            </div>
+            <span class="text-[10px] text-gold bg-gold/10 px-2 py-0.5 rounded border border-gold/30 font-bold">${s.rate} ر.س/س</span>
+          </div>
+          <div class="flex justify-between text-[10px] text-slate-300 bg-forest-dark p-1.5 rounded">
+            <span><i class="fa-solid fa-clock text-amber-400 ml-1"></i>${s.date}</span>
+            <span>${s.hours} ساعات</span>
+          </div>
+          <div class="flex gap-1.5">
+            <button onclick="viewContract('${s.id}')" class="flex-1 bg-forest border border-gold text-gold font-bold py-1.5 rounded-lg text-[10px]"><i class="fa-solid fa-file-contract"></i> العقد</button>
+            <button onclick="startActiveShift('${s.id}')" class="flex-1 bg-gradient-to-r from-gold to-gold-light text-forest-dark font-black py-1.5 rounded-lg text-[10px]"><i class="fa-solid fa-play"></i> بدء</button>
+          </div>
+        </div>
+      `).join('');
+  } else {
+    content = state.shifts.past.length === 0
+      ? `<p class="text-center text-slate-400 text-xs py-8">لا توجد ورديات سابقة</p>`
+      : state.shifts.past.map(s => `
+        <div class="bg-forest-surface p-3 rounded-2xl border border-white/5 space-y-1.5">
+          <div class="flex justify-between items-start">
+            <div>
+              <h4 class="font-bold text-white text-[11px]">${s.title}</h4>
+              <p class="text-[9px] text-slate-400">${s.date} • ${s.place}</p>
+            </div>
+            <div class="text-left">
+              <p class="text-emerald-400 font-black text-xs">+${s.earned} ر.س</p>
+              <p class="text-[9px] text-gold">${'★'.repeat(s.rating)}${'☆'.repeat(5-s.rating)}</p>
+            </div>
+          </div>
+        </div>
+      `).join('');
+  }
+
+  c.innerHTML = `
+    ${state.activeShift ? `
+    <div class="bg-gradient-to-r from-emerald-600 to-emerald-500 p-3 rounded-2xl border border-emerald-400 space-y-2">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+        <span class="text-[10px] font-black text-white">وردية نشطة</span>
+      </div>
+      <h3 class="font-bold text-white text-xs">${state.activeShift.title}</h3>
+      <button onclick="showActiveShiftOverlay()" class="w-full bg-white text-emerald-700 font-black py-1.5 rounded-xl text-xs">استعراض</button>
+    </div>` : ''}
+    <div class="flex gap-1 bg-forest p-1 rounded-xl">${tabsHtml}</div>
+    <div class="space-y-2">${content}</div>
+  `;
+}
+
+function viewContract(shiftId) {
+  const shift = state.shifts.upcoming.find(s => s.id === shiftId);
+  if (!shift) return;
+  openModal(`
+    <div class="bg-forest-surface rounded-2xl p-4 border-2 border-gold w-full max-w-sm space-y-3 slide-up">
+      <div class="flex justify-between items-center border-b border-gold/20 pb-2">
+        <span class="font-black text-gold text-xs">العقد #${shift.id}</span>
+        <span class="bg-emerald-500/20 text-emerald-300 text-[9px] px-2 py-0.5 rounded-full border border-emerald-500/30">موثق</span>
+      </div>
+      <div class="bg-forest-dark p-2.5 rounded-xl space-y-1 text-[10px]">
+        <p class="text-slate-300"><strong class="text-gold">الطرف الأول:</strong> منصة وردية</p>
+        <p class="text-slate-300"><strong class="text-gold">الطرف الثاني:</strong> ${shift.place}</p>
+        <p class="text-slate-300"><strong class="text-gold">الطرف الثالث:</strong> ${state.user.name}</p>
+        <p class="text-slate-300"><strong class="text-gold">الأجر:</strong> ${shift.rate} ر.س/س × ${shift.hours} ساعات</p>
+      </div>
+      <div class="bg-forest-dark p-3 rounded-xl border border-gold/30 space-y-1">
+        <h4 class="font-extrabold text-gold text-[11px]"><i class="fa-solid fa-shield-halved text-amber-400 ml-1"></i> الضمان الثلاثي:</h4>
+        <ul class="list-disc list-inside text-[10px] space-y-1 text-slate-200">
+          <li>تأمين ضد الحوادث حتى 50,000 ر.س</li>
+          <li>تحويل الأجر آلياً بعد الوردية</li>
+          <li>حضور QR جغرافي</li>
+        </ul>
+      </div>
+      <div class="flex gap-1.5">
+        <button onclick="closeModal()" class="flex-1 bg-forest border border-gold text-gold font-bold py-2 rounded-xl text-xs">إغلاق</button>
+        <button onclick="signAndStart('${shift.id}')" class="flex-1 bg-gradient-to-r from-gold to-gold-light text-forest-dark font-black py-2 rounded-xl text-xs">توقيع وبدء</button>
+      </div>
+    </div>
+  `);
+}
+function signAndStart(id) { closeModal(); startActiveShift(id); }
+
+/* ============ PROFILE ============ */
+function renderProfile() {
+  const c = document.getElementById('screenContainer');
+  c.innerHTML = `
+    <div class="bg-forest-surface p-3.5 rounded-2xl border border-gold/30 space-y-3">
+      <div class="flex items-center gap-3 border-b border-gold/20 pb-3">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-gold to-gold-light text-forest-dark font-black flex items-center justify-center text-xl shadow border border-white">ع</div>
+        <div class="flex-1">
+          <h3 class="font-black text-white text-sm">${state.user.name}</h3>
+          <p class="text-[10px] text-emerald-300">مقدم خدمة موسمية</p>
+          <div class="flex items-center gap-1 text-[10px] text-gold font-bold mt-0.5">
+            <i class="fa-solid fa-star"></i> ${state.user.rating} • ${state.user.totalShifts} وردية
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-1.5">
+        <button onclick="openWallet()" class="bg-forest-dark p-2 rounded-xl text-center border border-white/10">
+          <i class="fa-solid fa-wallet text-gold text-sm mb-0.5"></i>
+          <p class="text-[9px] text-emerald-200 font-bold">المحفظة</p>
+        </button>
+        <button onclick="openChat()" class="bg-forest-dark p-2 rounded-xl text-center border border-white/10">
+          <i class="fa-solid fa-comments text-gold text-sm mb-0.5"></i>
+          <p class="text-[9px] text-emerald-200 font-bold">المحادثات</p>
+        </button>
+        <button onclick="openSettings()" class="bg-forest-dark p-2 rounded-xl text-center border border-white/10">
+          <i class="fa-solid fa-gear text-gold text-sm mb-0.5"></i>
+          <p class="text-[9px] text-emerald-200 font-bold">الإعدادات</p>
+        </button>
+      </div>
+
+      <div class="space-y-2">
+        <h4 class="font-extrabold text-gold text-[11px]">المستندات:</h4>
+        <div class="flex items-center justify-between bg-forest-dark p-2 rounded-xl text-[10px]">
+          <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-file-pdf text-red-400"></i> السيرة الذاتية</span>
+          <span class="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded">موثق</span>
+        </div>
+        <div class="flex items-center justify-between bg-forest-dark p-2 rounded-xl text-[10px]">
+          <span class="flex items-center gap-2 text-slate-200"><i class="fa-solid fa-id-card text-blue-400"></i> تصريح المشاعر</span>
+          <span class="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded">ساري</span>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <h4 class="font-extrabold text-gold text-[11px]">التقييمات (${state.reviews.length}):</h4>
+        ${state.reviews.map(r => `
+          <div class="bg-forest-dark p-2 rounded-xl text-[10px] space-y-1">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-white">${r.name}</span>
+              <span class="text-gold">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+            </div>
+            <p class="text-slate-300">${r.text}</p>
+            <p class="text-[8px] text-slate-500">${r.date}</p>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/* ============ APPLY ============ */
+function applyToShift(title, rate, place) {
+  if (!confirm(`التقديم على "${title}" بأجر ${rate} ر.س/ساعة في ${place}؟`)) return;
+  state.shifts.upcoming.unshift({
+    id: 'WRD-' + Date.now(),
+    title, place, rate, hours: 6,
+    date: 'اليوم ' + new Date().toLocaleTimeString('ar-SA', {hour:'2-digit',minute:'2-digit'})
+  });
+  alert('✅ تم إرسال طلبك!');
+  state.shiftsSubTab = 'upcoming';
+  switchTab('shifts');
+}
+
+/* ============ ACTIVE SHIFT ============ */
+function startActiveShift(shiftId) {
+  const shift = state.shifts.upcoming.find(s => s.id === shiftId);
+  if (!shift) return;
+  if (!confirm(`بدء وردية "${shift.title}"؟`)) return;
+  state.activeShift = {
+    id: shift.id, title: shift.title, place: shift.place,
+    baseRate: shift.rate, startTime: Date.now(), elapsed: 0, isBreak: false
+  };
+  state.shifts.upcoming = state.shifts.upcoming.filter(s => s.id !== shiftId);
+  if (activeShiftTimer) clearInterval(activeShiftTimer);
+  activeShiftTimer = setInterval(updateActiveShiftTimer, 1000);
+  showActiveShiftOverlay();
+  renderAppScreen();
+}
+function showActiveShiftOverlay() {
+  if (!state.activeShift) return;
+  showEl('activeShiftOverlay');
+  renderActiveShift();
+}
+function hideActiveShiftOverlay() { hideEl('activeShiftOverlay'); }
+function renderActiveShift() {
+  const ov = document.getElementById('activeShiftOverlay');
+  const shift = state.activeShift;
+  if (!shift) return;
+  ov.innerHTML = `
+    <div class="flex flex-col h-full pt-8 px-4 pb-4 overflow-y-auto hide-scrollbar">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+          <span class="text-[10px] font-bold text-emerald-300">وردية نشطة</span>
+        </div>
+        <button onclick="hideActiveShiftOverlay()" class="w-8 h-8 rounded-full bg-forest-surface border border-gold/30 flex items-center justify-center">
+          <i class="fa-solid fa-xmark text-gold"></i>
+        </button>
+      </div>
+
+      <div class="text-center space-y-1 mb-4">
+        <h2 class="text-base font-black text-gold">${shift.title}</h2>
+        <p class="text-[10px] text-emerald-300"><i class="fa-solid fa-location-dot"></i> ${shift.place}</p>
+      </div>
+
+      <div class="bg-forest-surface rounded-3xl p-5 border-2 border-gold/40 text-center space-y-1 mb-3">
+        <p class="text-[10px] text-emerald-300">الوقت المنقضي</p>
+        <p id="activeShiftTimer" class="text-4xl font-black text-gold font-mono tracking-wider">00:00:00</p>
+        <div class="mt-2 pt-2 border-t border-gold/20">
+          <p class="text-[10px] text-emerald-300">الأرباح الحالية</p>
+          <p id="activeShiftEarnings" class="text-2xl font-black text-emerald-400">0.00 ر.س</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <div class="bg-forest-surface p-2 rounded-xl text-center border border-white/10">
+          <p class="text-[9px] text-slate-400">الأجر/ساعة</p>
+          <p class="text-xs font-black text-gold">${shift.baseRate} ر.س</p>
+        </div>
+        <div class="bg-forest-surface p-2 rounded-xl text-center border border-white/10">
+          <p class="text-[9px] text-slate-400">الحالة</p>
+          <p id="shiftStatusText" class="text-xs font-black ${shift.isBreak ? 'text-amber-400' : 'text-emerald-400'}">${shift.isBreak ? '⏸ راحة' : '▶ نشطة'}</p>
+        </div>
+      </div>
+
+      <div class="bg-forest-surface/60 p-2 rounded-xl border border-emerald-500/30 flex items-center gap-2 mb-3">
+        <i class="fa-solid fa-location-crosshairs text-emerald-400 animate-pulse"></i>
+        <span class="text-[10px] text-emerald-200">الموقع يُشارك مع المنشأة</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 mb-2">
+        <button onclick="toggleBreak()" class="bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black py-2.5 rounded-xl text-xs">
+          <i class="fa-solid fa-pause ml-1"></i> راحة
+        </button>
+        <button onclick="showSOS()" class="bg-red-600 text-white font-black py-2.5 rounded-xl text-xs pulse-ring">
+          <i class="fa-solid fa-triangle-exclamation ml-1"></i> SOS
+        </button>
+      </div>
+
+      <div class="mt-auto space-y-2 pt-2">
+        <button onclick="showCheckinQR()" class="w-full bg-forest-surface border border-gold/30 text-gold font-bold py-2 rounded-xl text-xs">
+          <i class="fa-solid fa-qrcode ml-1"></i> QR الحضور
+        </button>
+        <button onclick="endActiveShift()" class="w-full bg-gradient-to-r from-red-600 to-red-500 text-white font-black py-3 rounded-xl text-sm">
+          <i class="fa-solid fa-stop-circle ml-1"></i> إنهاء الوردية
+        </button>
+      </div>
+    </div>
+  `;
+  updateActiveShiftTimer();
+}
+function updateActiveShiftTimer() {
+  if (!state.activeShift) return;
+  const s = state.activeShift;
+  if (!s.isBreak) s.elapsed = Math.floor((Date.now() - s.startTime) / 1000);
+  const timerEl = document.getElementById('activeShiftTimer');
+  const earnEl = document.getElementById('activeShiftEarnings');
+  if (timerEl) timerEl.textContent = formatDuration(s.elapsed);
+  if (earnEl) earnEl.textContent = ((s.elapsed / 3600) * s.baseRate).toFixed(2) + ' ر.س';
+}
+function formatDuration(sec) {
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function toggleBreak() {
+  if (!state.activeShift) return;
+  state.activeShift.isBreak = !state.activeShift.isBreak;
+  if (state.activeShift.isBreak) {
+    state.activeShift.pausedAt = state.activeShift.elapsed;
+    state.activeShift.startTime = null;
+  } else {
+    state.activeShift.startTime = Date.now() - state.activeShift.pausedAt * 1000;
+  }
+  renderActiveShift();
+}
+function endActiveShift() {
+  if (!state.activeShift) return;
+  if (!confirm('إنهاء الوردية؟')) return;
+  const s = state.activeShift;
+  const earned = Math.round((s.elapsed / 3600) * s.baseRate);
+  state.wallet.balance += earned;
+  state.wallet.transactions.unshift({
+    type:'credit', amount: earned,
+    description: `أرباح وردية: ${s.title}`,
+    date: new Date().toLocaleDateString('ar-SA')
+  });
+  state.shifts.past.unshift({
+    id: s.id, title: s.title, place: s.place,
+    date: new Date().toLocaleDateString('ar-SA'),
+    rate: s.baseRate, hours: Math.round(s.elapsed/3600 * 10)/10,
+    earned: earned, rating: 5
+  });
+  if (activeShiftTimer) clearInterval(activeShiftTimer);
+  activeShiftTimer = null;
+  const shiftTitle = s.title;
+  state.activeShift = null;
+  hideActiveShiftOverlay();
+  renderAppScreen();
+  showRateModal(shiftTitle);
+}
+function showCheckinQR() {
+  openModal(`
+    <div class="bg-forest-surface rounded-2xl p-5 border-2 border-gold w-full max-w-xs text-center space-y-3 slide-up">
+      <h3 class="font-black text-gold text-sm">QR الحضور الجغرافي</h3>
+      <div class="w-40 h-40 mx-auto bg-white rounded-xl p-2 flex items-center justify-center">
+        <i class="fa-solid fa-qrcode text-forest-dark" style="font-size:120px"></i>
+      </div>
+      <p class="text-[10px] text-slate-300">امسح عند المنشأة لتأكيد حضورك</p>
+      <button onclick="closeModal()" class="w-full bg-gold text-forest-dark font-black py-2 rounded-xl text-xs">إغلاق</button>
+    </div>
+  `);
+}
+
+/* ============ SOS ============ */
+function showSOS() {
+  openModal(`
+    <div class="bg-forest-surface rounded-2xl p-4 border-2 border-red-500 w-full max-w-sm slide-up">
+      <div class="text-center space-y-2 mb-3">
+        <div class="w-16 h-16 mx-auto rounded-full bg-red-500/20 border-2 border-red-500 flex items-center justify-center pulse-ring">
+          <i class="fa-solid fa-triangle-exclamation text-red-500 text-3xl"></i>
+        </div>
+        <h3 class="text-red-400 font-black text-lg">طوارئ</h3>
+        <p class="text-xs text-slate-300">سيتم إرسال موقعك للجهات المختصة</p>
+      </div>
+      <div class="space-y-2">
+        <button onclick="triggerSOS('emergency')" class="w-full bg-red-600 text-white font-black py-3 rounded-xl text-sm">
+          <i class="fa-solid fa-phone ml-1"></i> اتصال 911
+        </button>
+        <button onclick="triggerSOS('facility')" class="w-full bg-amber-500 text-white font-black py-3 rounded-xl text-sm">
+          <i class="fa-solid fa-building ml-1"></i> الاتصال بالمنشأة
+        </button>
+        <button onclick="triggerSOS('location')" class="w-full bg-forest border border-gold text-gold font-black py-3 rounded-xl text-sm">
+          <i class="fa-solid fa-location-dot ml-1"></i> مشاركة الموقع
+        </button>
+        <button onclick="closeModal()" class="w-full text-slate-400 text-xs py-2">إلغاء</button>
+      </div>
+    </div>
+  `);
+}
+function triggerSOS(type) {
+  closeModal();
+  let msg = type === 'emergency' ? '📞 جاري الاتصال بالطوارئ...' : type === 'facility' ? '📞 جاري الاتصال بالمنشأة...' : '📍 تم إرسال موقعك';
+  alert(msg + '\n\nرقم البلاغ: #SOS-' + Date.now().toString().slice(-6));
+}
+
+/* ============ RATING ============ */
+function showRateModal(shiftTitle) {
+  selectedRating = 0;
+  openModal(`
+    <div class="bg-forest-surface rounded-2xl p-4 border border-gold w-full max-w-sm slide-up">
+      <div class="text-center space-y-1 mb-3">
+        <div class="w-16 h-16 mx-auto rounded-full bg-gold/20 border-2 border-gold flex items-center justify-center">
+          <i class="fa-solid fa-star text-gold text-3xl"></i>
+        </div>
+        <h3 class="text-gold font-black text-base">قيّم تجربتك</h3>
+        <p class="text-xs text-slate-300">وردية "${shiftTitle}"</p>
+      </div>
+      <div class="flex justify-center gap-2 my-4" id="ratingStars">
+        ${[1,2,3,4,5].map(i => `<button onclick="setRating(${i})" class="text-3xl text-slate-600 transition-all">★</button>`).join('')}
+      </div>
+      <textarea id="ratingComment" placeholder="تعليق (اختياري)..." class="w-full bg-forest-dark border border-gold/30 rounded-xl p-2 text-xs text-white mb-2 resize-none" rows="2"></textarea>
+      <button onclick="submitRating()" class="w-full bg-gradient-to-r from-gold to-gold-light text-forest-dark font-black py-2.5 rounded-xl text-sm">
+        إرسال التقييم
+      </button>
+    </div>
+  `);
+}
+function setRating(n) {
+  selectedRating = n;
+  document.querySelectorAll('#ratingStars button').forEach((b, i) => {
+    b.className = 'text-3xl transition-all ' + (i < n ? 'text-gold' : 'text-slate-600');
+  });
+}
+function submitRating() {
+  if (selectedRating === 0) { alert('اختر عدد النجوم'); return; }
+  const comment = document.getElementById('ratingComment').value.trim();
+  state.reviews.unshift({
+    id: Date.now(), name: 'المنشأة السابقة',
+    rating: selectedRating, text: comment || 'بدون تعليق',
+    date: new Date().toLocaleDateString('ar-SA')
+  });
+  closeModal();
+  alert('✅ شكراً لتقييمك!');
+  renderAppScreen();
+}
+
+/* ============ NOTIFICATIONS ============ */
+function openNotifications() {
+  showEl('notificationsDrawer');
+  renderNotifications();
+  state.notifications.forEach(n => n.read = true);
+  updateBadges();
+}
+function closeNotifications() { hideEl('notificationsDrawer'); }
+function renderNotifications() {
+  const dr = document.getElementById('notificationsDrawer');
+  dr.innerHTML = `
+    <div class="pt-10 px-4 pb-2 border-b border-gold/20 flex justify-between items-center">
+      <h3 class="font-black text-gold text-sm">🔔 الإشعارات</h3>
+      <button onclick="closeNotifications()" class="w-8 h-8 rounded-full bg-forest-surface border border-gold/30 flex items-center justify-center">
+        <i class="fa-solid fa-xmark text-gold text-xs"></i>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto hide-scrollbar p-3 space-y-2">
+      ${state.notifications.length === 0 ? `<p class="text-center text-slate-400 text-xs py-10">لا توجد إشعارات</p>` :
+        state.notifications.map(n => `
+          <div class="bg-forest-surface p-3 rounded-xl border ${n.read ? 'border-white/5' : 'border-gold/40'} space-y-1">
+            <div class="flex items-start gap-2">
+              <i class="fa-solid ${n.icon} ${n.color} mt-0.5"></i>
+              <div class="flex-1">
+                <h4 class="font-bold text-white text-xs">${n.title}</h4>
+                <p class="text-[10px] text-slate-300">${n.body}</p>
+                <p class="text-[8px] text-slate-500 mt-0.5">${n.time}</p>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+    </div>
+  `;
+}
+function updateBadges() {
+  const unread = state.notifications.filter(n => !n.read).length;
+  const nb = document.getElementById('notifBadge');
+  if (nb) { nb.textContent = unread; nb.style.display = unread ? 'flex' : 'none'; }
+  const unreadChat = state.chats.reduce((s, c) => s + c.unread, 0);
+  const cb = document.getElementById('chatBadge');
+  if (cb) { cb.textContent = unreadChat; cb.style.display = unreadChat ? 'flex' : 'none'; }
+}
+
+/* ============ CHAT ============ */
+function openChat() { showEl('chatScreen'); renderChatList(); }
+function closeChat() { hideEl('chatScreen'); }
+function renderChatList() {
+  const s = document.getElementById('chatScreen');
+  s.innerHTML = `
+    <div class="pt-10 px-4 pb-2 border-b border-gold/20 flex justify-between items-center">
+      <h3 class="font-black text-gold text-sm">💬 المحادثات</h3>
+      <button onclick="closeChat()" class="w-8 h-8 rounded-full bg-forest-surface border border-gold/30 flex items-center justify-center">
+        <i class="fa-solid fa-xmark text-gold text-xs"></i>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto hide-scrollbar p-3 space-y-2">
+      ${state.chats.map(c => `
+        <button onclick="openChatThread(${c.id})" class="w-full bg-forest-surface p-3 rounded-xl border border-white/10 flex items-center gap-2 text-right hover:border-gold transition">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-gold to-gold-light text-forest-dark font-black flex items-center justify-center">${c.avatar}</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex justify-between items-center">
+              <span class="font-bold text-white text-xs">${c.name}</span>
+              <span class="text-[8px] text-slate-400">${c.time}</span>
+            </div>
+            <p class="text-[10px] text-slate-300 truncate">${c.lastMessage}</p>
+          </div>
+          ${c.unread > 0 ? `<span class="bg-emerald-500 text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center">${c.unread}</span>` : ''}
+        </button>
+      `).join('')}
+    </div>
+  `;
+}
+function openChatWith(id) { openChat(); setTimeout(() => openChatThread(id), 100); }
+function openChatThread(id) {
+  const chat = state.chats.find(c => c.id === id);
+  if (!chat) return;
+  chat.unread = 0;
+  updateBadges();
+  showEl('chatView');
+  const v = document.getElementById('chatView');
+  v.innerHTML = `
+    <div class="pt-10 px-4 pb-2 border-b border-gold/20 flex justify-between items-center">
+      <button onclick="closeChatThread()" class="w-8 h-8 rounded-full bg-forest-surface border border-gold/30 flex items-center justify-center">
+        <i class="fa-solid fa-arrow-right text-gold text-xs"></i>
+      </button>
+      <h3 class="font-black text-gold text-sm">${chat.name}</h3>
+      <div class="w-8 h-8"></div>
+    </div>
+    <div class="flex-1 overflow-y-auto hide-scrollbar p-3 space-y-2" id="messagesList">
+      ${chat.messages.map(m => `
+        <div class="flex ${m.from === 'me' ? 'justify-end' : 'justify-start'}">
+          <div class="max-w-[75%] ${m.from === 'me' ? 'bg-gold text-forest-dark' : 'bg-forest-surface text-white'} px-3 py-2 rounded-2xl text-xs space-y-0.5">
+            <p>${m.text}</p>
+            <p class="text-[8px] opacity-60 text-left">${m.time}</p>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="p-3 border-t border-gold/20 flex gap-2">
+      <input id="chatInput" type="text" placeholder="اكتب رسالة..." class="flex-1 bg-forest-surface border border-gold/30 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-gold" onkeydown="if(event.key==='Enter')sendMessage(${chat.id})">
+      <button onclick="sendMessage(${chat.id})" class="w-10 h-10 rounded-xl bg-gold text-forest-dark flex items-center justify-center">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </div>
+  `;
+  setTimeout(() => {
+    const list = document.getElementById('messagesList');
+    if (list) list.scrollTop = list.scrollHeight;
+  }, 50);
+}
+function closeChatThread() {
+  hideEl('chatView');
+  renderChatList();
+}
+function sendMessage(chatId) {
+  const inp = document.getElementById('chatInput');
+  const text = inp.value.trim();
+  if (!text) return;
+  const chat = state.chats.find(c => c.id === chatId);
+  chat.messages.push({ from:'me', text, time: new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'}) });
+  chat.lastMessage = text;
+  chat.time = 'الآن';
+  inp.value = '';
+  openChatThread(chatId);
+}
+
+/* ============ WALLET ============ */
+function openWallet() {
+  showEl('walletScreen');
+  const w = document.getElementById('walletScreen');
+  w.innerHTML = `
+    <div class="pt-10 px-4 pb-2 border-b border-gold/20 flex justify-between items-center">
+      <h3 class="font-black text-gold text-sm">💳 المحفظة</h3>
+      <button onclick="closeWallet()" class="w-8 h-8 rounded-full bg-forest-surface border border-gold/30 flex items-center justify-center">
+        <i class="fa-solid fa-xmark text-gold text-xs"></i>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto hide-scrollbar p-3 space-y-3">
+      <div class="bg-gradient-to-br from-gold via-gold-light to-gold-dark p-4 rounded-2xl text-forest-dark space-y-1 shadow-xl">
+        <p class="text-[10px] font-bold opacity-80">الرصيد المتاح</p>
+        <p class="text-3xl font-black">${state.wallet.balance.toLocaleString('ar-SA')} <span class="text-sm">ر.س</span></p>
+        <div class="flex gap-2 pt-2">
+          <button onclick="alert('سيتم فتح نافذة السحب')" class="flex-1 bg-forest-dark text-gold font-black py-1.5 rounded-lg text-[10px]">سحب</button>
+          <button onclick="alert('سيتم فتح نافذة الإيداع')" class="flex-1 bg-forest-dark/70 text-gold font-bold py-1.5 rounded-lg text-[10px]">إيداع</button>
+        </div>
+      </div>
+      <div class="space-y-2">
+        <h4 class="text-[11px] font-bold text-gold">سجل العمليات:</h4>
+        ${state.wallet.transactions.map(t => `
+          <div class="bg-forest-surface p-2.5 rounded-xl border border-white/5 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full ${t.type === 'credit' ? 'bg-emerald-500/20' : 'bg-red-500/20'} flex items-center justify-center">
+                <i class="fa-solid fa-${t.type === 'credit' ? 'arrow-down' : 'arrow-up'} ${t.type === 'credit' ? 'text-emerald-400' : 'text-red-400'} text-xs"></i>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-white">${t.description}</p>
+                <p class="text-[8px] text-slate-400">${t.date}</p>
+              </div>
+            </div>
+            <span class="font-black text-xs ${t.type === 'credit' ? 'text-emerald-400' : 'text-red-400'}">
+              ${t.type === 'credit' ? '+' : '-'}${t.amount.toLocaleString('ar-SA')}
+            </span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+function closeWallet() { hideEl('walletScreen'); }
+
+/* ============ SETTINGS ============ */
+function openSettings() {
+  showEl('settingsScreen');
+  const s = document.getElementById('settingsScreen');
+  s.innerHTML = `
+    <div class="pt-10 px-4 pb-2 border-b border-gold/20 flex justify-between items-center">
+      <h3 class="font-black text-gold text-sm">⚙️ الإعدادات</h3>
+      <button onclick="closeSettings()" class="w-8 h-8 rounded-full bg-forest-surface border border-gold/30 flex items-center justify-center">
+        <i class="fa-solid fa-xmark text-gold text-xs"></i>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto hide-scrollbar p-3 space-y-2">
+      <div class="bg-forest-surface rounded-xl p-3 space-y-2 border border-white/5">
+        <h4 class="text-[10px] font-bold text-gold">الإشعارات</h4>
+        <label class="flex justify-between items-center text-xs">
+          <span class="text-slate-200">ورديات جديدة</span>
+          <input type="checkbox" checked class="accent-gold">
+        </label>
+        <label class="flex justify-between items-center text-xs">
+          <span class="text-slate-200">تذكير الحضور</span>
+          <input type="checkbox" checked class="accent-gold">
+        </label>
+      </div>
+      <div class="bg-forest-surface rounded-xl p-3 space-y-2 border border-white/5">
+        <h4 class="text-[10px] font-bold text-gold">اللغة</h4>
+        <select class="w-full bg-forest-dark border border-gold/30 rounded-lg p-2 text-xs text-white">
+          <option>العربية</option>
+          <option>English</option>
+          <option>اردو</option>
+        </select>
+      </div>
+      <div class="bg-forest-surface rounded-xl p-3 space-y-2 border border-white/5">
+        <h4 class="text-[10px] font-bold text-gold">وضع عدم الاتصال</h4>
+        <label class="flex justify-between items-center text-xs">
+          <span class="text-slate-200">تفعيل</span>
+          <input type="checkbox" ${state.isOffline ? 'checked' : ''} onchange="toggleOffline(this.checked)" class="accent-gold">
+        </label>
+      </div>
+      <div class="bg-forest-surface rounded-xl p-3 border border-white/5">
+        <button onclick="logout()" class="w-full text-red-400 font-bold text-xs py-1">🚪 تسجيل الخروج</button>
+      </div>
+      <p class="text-center text-[9px] text-slate-500 pt-2">Wardya v1.0</p>
+    </div>
+  `;
+}
+function closeSettings() { hideEl('settingsScreen'); }
+function toggleOffline(on) {
+  state.isOffline = on;
+  const icon = document.querySelector('#connectionBox i');
+  const text = document.getElementById('connectionStatus');
+  if (on) {
+    icon.className = 'fa-solid fa-plane-slash text-amber-400';
+    text.textContent = 'بدون اتصال';
+    text.className = 'text-amber-400';
+  } else {
+    icon.className = 'fa-solid fa-wifi text-emerald-400';
+    text.textContent = 'متصل';
+    text.className = 'text-emerald-400';
+  }
+}
+
+/* ============ MODALS ============ */
+function openModal(html) {
+  const m = document.getElementById('modalContainer');
+  m.innerHTML = html;
+  m.classList.remove('force-hidden');
+}
+function closeModal() {
+  document.getElementById('modalContainer').classList.add('force-hidden');
+  document.getElementById('modalContainer').innerHTML = '';
+}
+
+/* ============ PRAYER ============ */
+function updatePrayerBar() {
+  const now = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  let next = null;
+  for (const p of state.prayerTimes) {
+    const [h, m] = p.time.split(':').map(Number);
+    if (h * 60 + m > nowMin) { next = p; break; }
+  }
+  if (!next) next = state.prayerTimes[0];
+  const el = document.getElementById('nextPrayerText');
+  if (el) el.textContent = `الصلاة القادمة: ${next.name} ${next.time}`;
+}
+
+/* ============ INIT ============ */
+function initApp() {
+  loadState();
+  buildOtpInputs();
+  if (state.isAuthenticated) {
+    showEl('mainApp');
+    hideEl('authScreen');
+  } else {
+    showEl('authScreen');
+    hideEl('mainApp');
+  }
+  updateRoleButtons();
+  updateNavBar();
+  renderAppScreen();
+  updateBadges();
+  updatePrayerBar();
+  setInterval(updatePrayerBar, 60000);
+}
+
+initApp();
+</script>
+</body>
+</html>
