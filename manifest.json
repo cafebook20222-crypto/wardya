@@ -1,0 +1,17 @@
+```json
+{
+  "name": "تطبيق وردية",
+  "short_name": "وردية",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#061c15",
+  "theme_color": "#0a2e23",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+```
