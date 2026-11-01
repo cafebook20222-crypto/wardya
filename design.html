@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>تصميم واجهات تطبيق وردية - PDF</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Cairo', sans-serif; background-color: #f3f4f6; padding: 20px; }
+  .phone-frame { width: 320px; height: 650px; background: #061c15; border-radius: 30px; border: 6px solid #334155; overflow: hidden; position: relative; margin: 0 auto; }
+  .screen-title { text-align: center; font-weight: bold; margin-bottom: 10px; margin-top: 20px; color: #0a2e23; font-size: 18px; }
+  
+  /* إعدادات الطباعة لضمان خروج PDF نظيف */
+  @media print {
+    body { background: white; padding: 0; }
+    .no-print { display: none !important; }
+    .grid-container { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 15px !important; }
+    .phone-frame { page-break-inside: avoid; border: 2px solid #ccc; height: auto; min-height: 500px; transform: scale(0.9); }
+  }
+</style>
+</head>
+<body>
+
+<div class="text-center mb-8 no-print">
+  <h1 class="text-3xl font-black text-[#0a2e23] mb-2">تقرير تصميم تطبيق وردية</h1>
+  <p class="text-gray-600 mb-4">اضغط على <strong>Ctrl + P</strong> واختر <strong>Save as PDF</strong> لحفظ هذا الملف وتقديمه للدكتورة.</p>
+  <button onclick="window.print()" class="bg-[#0a2e23] text-white px-6 py-2 rounded-lg font-bold">طباعة / حفظ PDF</button>
+</div>
+
+<div class="grid-container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 1000px; margin: 0 auto;">
+
+  <!-- 1. شاشة تسجيل الدخول -->
+  <div>
+    <div class="screen-title">1. شاشة تسجيل الدخول (OTP)</div>
+    <div class="phone-frame p-6 flex flex-col items-center justify-center">
+      <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#e6ca65] to-[#d4af37] flex items-center justify-center text-[#061c15] font-black text-4xl shadow-2xl border-4 border-[#e6ca65]/30 mb-4">و</div>
+      <h1 class="text-2xl font-black text-[#d4af37] mb-2">وَردِيّة</h1>
+      <p class="text-xs text-[#a7f3d0] mb-8">منصة التوظيف الموسمي بالساعة</p>
+      <div class="w-full space-y-3">
+        <label class="block text-xs font-bold text-[#a7f3d0]">رقم الجوال</label>
+        <div class="flex items-center gap-2 bg-[#124839] border border-[#d4af37]/30 rounded-xl p-3">
+          <span class="text-gray-300 text-sm font-bold" dir="ltr">+966</span>
+          <input type="text" placeholder="5XXXXXXXX" class="flex-1 bg-transparent outline-none text-white font-bold text-sm text-center" dir="ltr">
+        </div>
+        <button class="w-full bg-gradient-to-r from-[#d4af37] to-[#e6ca65] text-[#061c15] font-black py-3 rounded-xl shadow-lg text-sm mt-4">إرسال رمز التحقق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. الشاشة الرئيسية -->
+  <div>
+    <div class="screen-title">2. الشاشة الرئيسية (الباحث)</div>
+    <div class="phone-frame p-4">
+      <div class="flex justify-between items-center border-b border-[#d4af37]/20 pb-2 mb-4">
+        <span class="text-white text-sm font-bold">الرئيسية</span>
+        <i class="fa-solid fa-bell text-[#d4af37]"></i>
+      </div>
+      <div class="grid grid-cols-3 gap-2 mb-4">
+        <div class="bg-[#124839] p-2 rounded-xl text-center border border-[#d4af37]/20">
+          <p class="text-[9px] text-[#a7f3d0]">الورديات</p>
+          <p class="text-sm font-black text-[#d4af37]">28</p>
+        </div>
+        <div class="bg-[#124839] p-2 rounded-xl text-center border border-[#d4af37]/20">
+          <p class="text-[9px] text-[#a7f3d0]">الساعات</p>
+          <p class="text-sm font-black text-white">164</p>
+        </div>
+        <div class="bg-[#124839] p-2 rounded-xl text-center border border-[#d4af37]/20">
+          <p class="text-[9px] text-[#a7f3d0]">الأرباح</p>
+          <p class="text-sm font-black text-[#34d399]">7,380</p>
+        </div>
+      </div>
+      <div class="bg-[#0a2e23] p-3 rounded-xl border border-[#d4af37]/30 text-center mb-4">
+        <h3 class="text-[#d4af37] font-bold text-xs"><i class="fa-solid fa-bolt text-amber-400"></i> ورديات عاجلة بمكة</h3>
+      </div>
+      <div class="bg-[#124839] p-3 rounded-xl border border-[#d4af37]/30 mb-2">
+        <h4 class="font-bold text-white text-xs mb-1">موظف استقبال وضيافة</h4>
+        <p class="text-[10px] text-[#a7f3d0] mb-2">فندق برج الساعة</p>
+        <button class="w-full bg-[#d4af37] text-[#061c15] font-black py-1.5 rounded-lg text-[10px]">تقديم سريع</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. الوردية النشطة -->
+  <div>
+    <div class="screen-title">3. الوردية النشطة (المؤقت والأرباح)</div>
+    <div class="phone-frame p-4">
+      <h2 class="text-base font-black text-[#d4af37] text-center mb-4">مشرف تفويج بمخيمات منى</h2>
+      <div class="bg-[#124839] rounded-3xl p-5 border-2 border-[#d4af37]/40 text-center mb-4">
+        <p class="text-[10px] text-[#a7f3d0] mb-2">الوقت المنقضي</p>
+        <p class="text-4xl font-black text-[#d4af37] font-mono">02:45:10</p>
+        <p class="text-xl font-black text-[#34d399] mt-3">165.00 ر.س</p>
+      </div>
+      <div class="grid grid-cols-2 gap-2">
+         <button class="bg-amber-500/20 text-amber-300 font-bold py-2 rounded-xl text-xs border border-amber-500/40">راحة</button>
+         <button class="bg-red-600 text-white font-bold py-2 rounded-xl text-xs">SOS طوارئ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. الحضور الجغرافي -->
+  <div>
+    <div class="screen-title">4. إثبات الحضور (GPS بدون نت)</div>
+    <div class="phone-frame p-4">
+      <div class="bg-[#124839] p-4 rounded-2xl border border-emerald-500/40 mt-10">
+        <h4 class="font-bold text-emerald-300 text-sm mb-2 text-center"><i class="fa-solid fa-location-crosshairs"></i> الحضور الجغرافي</h4>
+        <p class="text-[10px] text-gray-300 text-center mb-4 leading-relaxed">يعمل بدون إنترنت. يحسب المسافة ويحفظ الحضور محلياً ويزامن عند عودة الشبكة.</p>
+        <div class="bg-[#061c15] p-3 rounded-xl text-center text-[10px] text-emerald-400 border border-emerald-500/30 mb-4">
+          أنت داخل النطاق (45 متر).<br>تم توقيع الحضور بنجاح!
+        </div>
+        <button class="w-full bg-emerald-600 text-white font-black py-3 rounded-xl text-xs">تسجيل الحضور الآن</button>
+        <div class="mt-2 bg-amber-500/10 border border-amber-500/30 p-2 rounded-lg text-center text-[9px] text-amber-300">
+          لديك 1 عمليات بانتظار المزامنة...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. المحفظة -->
+  <div>
+    <div class="screen-title">5. المحفظة الإلكترونية</div>
+    <div class="phone-frame p-4">
+      <h3 class="text-[#d4af37] font-bold text-center mb-4">المحفظة</h3>
+      <div class="bg-gradient-to-br from-[#d4af37] to-[#aa8c2c] p-4 rounded-2xl text-[#061c15] mb-4">
+        <p class="text-[10px] font-bold">الرصيد المتاح</p>
+        <p class="text-3xl font-black">7,380 ر.س</p>
+      </div>
+      <div class="bg-[#124839] p-3 rounded-xl border border-white/5 mb-2 flex justify-between items-center text-xs">
+        <span class="text-white">أرباح وردية - برج الساعة</span>
+        <span class="text-emerald-400">+360</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. المحادثات -->
+  <div>
+    <div class="screen-title">6. المحادثات والتواصل</div>
+    <div class="phone-frame p-4">
+      <h3 class="text-[#d4af37] font-bold text-center mb-4">المحادثات</h3>
+      <div class="bg-[#124839] p-3 rounded-xl border border-white/10 flex items-center gap-2 mb-2">
+        <div class="w-10 h-10 rounded-full bg-[#d4af37] text-[#061c15] flex items-center justify-center font-bold">ف</div>
+        <div>
+          <h4 class="text-white text-xs font-bold">فندق برج الساعة</h4>
+          <p class="text-[9px] text-gray-300">متى تستطيع البدء؟</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. الملف الشخصي -->
+  <div>
+    <div class="screen-title">7. الملف الشخصي والتقييمات</div>
+    <div class="phone-frame p-4 text-center">
+      <div class="w-16 h-16 mx-auto rounded-full bg-[#d4af37] text-[#061c15] flex items-center justify-center font-black text-xl mb-2">ع</div>
+      <h3 class="text-white font-bold">عبد الله محمد العتيبي</h3>
+      <p class="text-[#d4af37] text-xs mb-4">★ 4.9 (28 وردية)</p>
+      <div class="bg-[#061c15] p-3 rounded-xl text-right mb-2 border border-white/5">
+        <p class="text-[10px] text-gray-300">"موظف ملتزم ومحترف جداً"</p>
+        <p class="text-[8px] text-gray-500 mt-1">- فندق برج الساعة</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. الخريطة -->
+  <div>
+    <div class="screen-title">8. الخريطة الحية (GPS)</div>
+    <div class="phone-frame p-4 relative bg-slate-900 flex items-center justify-center">
+      <div class="absolute inset-0 opacity-20" style="background-image:radial-gradient(#d4af37 1px,transparent 1px);background-size:20px 20px;"></div>
+      <div class="w-12 h-12 bg-[#d4af37]/20 border border-[#d4af37] rounded-full flex items-center justify-center animate-pulse z-10">
+        <i class="fa-solid fa-kaaba text-[#d4af37] text-lg"></i>
+      </div>
+      <div class="absolute top-10 right-10 bg-[#d4af37] text-[#061c15] font-black px-2 py-1 rounded-lg text-[9px] shadow-lg">📍 45 ر.س</div>
+      <div class="absolute bottom-12 left-8 bg-emerald-500 text-white font-black px-2 py-1 rounded-lg text-[9px] shadow-lg">⛺ 60 ر.س</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
